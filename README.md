@@ -1,2 +1,2 @@
 # mean
-Using MEAN stack to build a demo application
+my sandbox application
