@@ -104,5 +104,9 @@ db.once("open", function() {
         res.sendStatus(200);
     });
 
-    app.listen(3000);
+    var port = process.env.PORT || 3000;
+
+    app.listen(port, function() {
+        console.log("port", port);
+    });
 });
