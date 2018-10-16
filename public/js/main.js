@@ -56,9 +56,9 @@ function saveIssue(e) {
     
     document.getElementById('issueInputForm').reset();
 
-    fetchIssues();
-
     e.preventDefault();
+
+    fetchIssues();
 }
 
 document.getElementById('issueInputForm').addEventListener('submit', saveIssue);
