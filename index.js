@@ -86,7 +86,7 @@ db.once("open", function() {
         Task.deleteOne(filter, function(err) {
             if (err) {
                 console.error(err);
-                res.sendStatus(500).send("error", err);
+                res.status(500).send("error", err);
             }
         });
 
@@ -99,7 +99,5 @@ db.once("open", function() {
         console.log("port", port);
     });
 
-    setInterval(function () {
-        fetchIssues();
-    }, 10000); // 10 sec
+    
 });

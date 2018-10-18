@@ -65,3 +65,7 @@ function deleteIssue(id) {
         }
     });
 }
+
+setInterval(function () {
+    fetchIssues();
+}, 10000); // 10 sec
