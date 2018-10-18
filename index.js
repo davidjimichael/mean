@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-// mongodb://<dbuser>:<dbpassword>@ds045507.mlab.com:45507/mic
 var uri = "mongodb://davidjimichael:Yell0w$tone@ds045507.mlab.com:45507/mic";
 var options = {
     useNewUrlParser: true
@@ -11,16 +10,6 @@ mongoose.connect(uri, options);
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function() {
-    // connected!!
-    /*
-    data: {
-            id: issueId,
-            description: issueDesc,
-            severity: issueSeverity,
-            assignedTo: issueAssignedTo,
-            status: issueStatus
-        }
-    */
     var taskSchema = new mongoose.Schema({
         issueId: String,
         description: String,
@@ -31,7 +20,6 @@ db.once("open", function() {
 
     var Task = mongoose.model("Task", taskSchema);
 
-
     const app = express();
 
     app.use(express.static("public"));
@@ -40,31 +28,29 @@ db.once("open", function() {
 
     app.get("/", function(req, res) {
 
-        res.sendFile(__dirname + "/index.html");
+        res.status(200).sendFile(__dirname + "/index.html");
 
     });
     
     app.post("/issues", function(req, res) {
         
-        var task = new Task(req.body);
-        console.debug("req.body", req.body);
-        console.debug("task", task);
-        task.save().then(function(val) {
-            console.log(val);
+        new Task(req.body).save().then(function(val) {
+        
         }).catch(function(err) {
             console.error(err);
         });
         
-        res.sendStatus(200);
+        res.status(200).send("OK");
         
     }).get("/issues", function(req, res) {
 
-        Task.find({}, function(error, tasks) {
-            if (error) {
-                console.error(error);
+        Task.find({}, function(err, tasks) {
+            if (err) {
+                console.error(err);
+                res.status(500).send('err', err);
             }
 
-            res.send(tasks);
+            res.status(200).send(tasks);
         });
         
     }).put("/issues/:id", function(req, res) {
@@ -73,21 +59,23 @@ db.once("open", function() {
             _id: req.params.id
         };
         
-        Task.find(filter, function(error, tasks) {
-            if (error) {
-                console.error(error);
-                res.sendStatus(500);
-            }
-
-            tasks.forEach(function(task) {
-                if (task._id === req.params.id) {
+        Task.find(filter, function(err, tasks) {
+            if (err) {
+                console.error(err);
+                res.send(err);
+            } else {   
+                tasks.forEach(function(task) {
                     task.open = false;
-                    task.save();
-                }
-            });
+                    task.save().then(function(_) {
+                        res.status(200).send("OK");
+                        // what to do here?
+                    }).catch(function(err) {
+                        console.error(err);
+                        res.status(500).send(err);
+                    });
+                });
+            }
         });
-
-        res.sendStatus(200);
         
     }).delete("/issues/:id", function(req, res) {
 
@@ -95,13 +83,14 @@ db.once("open", function() {
             _id: req.params.id
         };
         
-        Task.deleteOne(filter, function(error) {
-            if (error) {
-                console.error(error);
-                res.sendStatus(500);
+        Task.deleteOne(filter, function(err) {
+            if (err) {
+                console.error(err);
+                res.sendStatus(500).send("error", err);
             }
         });
-        res.sendStatus(200);
+
+        res.sendStatus(200).send("OK");
     });
 
     var port = process.env.PORT || 3000;

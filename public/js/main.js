@@ -1,28 +1,11 @@
-
-function getIssues() {
-    // var xhr = new XMLHttpRequest();
-    // xhr.open("GET", "/issues", false); // false = sync
-    // xhr.send(null);
-    // var issues = xhr.responseText === "" ? [] : JSON.parse(xhr.responseText);
-    // return issues;
-    $.ajax({
-        url: "/issues",
-        type: "GET",
-        success: function(issues) {
-            var x = issues;
-            debugger;
-        }
-    })
-}
-
 function fetchIssues() {
     $.get("/issues", function (issues) {
-
-        var issuesList = document.getElementById('issuesList');
+        var issuesList = document.getElementById("issuesList");
         
         issuesList.innerHTML = '';
         
         for (var i = 0; i < issues.length; i++) {
+            var _issue = issues[i];
             var id = issues[i]._id;
             var desc = issues[i].description;
             var severity = issues[i].severity;
@@ -35,7 +18,7 @@ function fetchIssues() {
             '<h3>' + desc + '</h3>' +
             '<p><span class="">Severity: </span> ' + severity + ' <br/> ' +
             '<span class="">Assigned:</span> ' + assignedTo + '</p>' +
-            // '<a href="#/" class="btn btn-warning" onclick="setStatusClosed(\'' + id + '\')">Close</a> ' +
+            '<a href="#/" class="btn btn-warning" onclick="setStatusClosed(\'' + id + '\')">Close</a> ' +
             '<a href="#/" class="btn btn-danger" onclick="deleteIssue(\'' + id + '\')">Delete</a>' +
             '</div></div>';
         }
@@ -44,14 +27,13 @@ function fetchIssues() {
     
 function saveIssue(e) {
     var issue = {
-        description: document.getElementById('issueDescInput').value,
-        severity: document.getElementById('issueSeverityInput').value,
-        assignedTo: document.getElementById('issueAssignedToInput').value,
+        description: document.getElementById("issueDescInput").value,
+        severity: document.getElementById("issueSeverityInput").value,
+        assignedTo: document.getElementById("issueAssignedToInput").value,
         open: true,
     };
     
     $.post("/issues", issue, function(res) {
-        console.debug("POST /issues");
     });
     
     document.getElementById('issueInputForm').reset();
@@ -68,7 +50,6 @@ function setStatusClosed(id) {
         url: "issues/" + id,
         type: "PUT",
         success: function (response) {
-            console.debug(response);
             fetchIssues();
             document.getElementById(String(id)).innerHTML = "Closed";
         }
@@ -83,5 +64,4 @@ function deleteIssue(id) {
             fetchIssues();
         }
     });
-    
 }
