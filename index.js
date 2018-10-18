@@ -76,7 +76,7 @@ db.once("open", function() {
                 });
             }
         });
-        
+
     }).delete("/issues/:id", function(req, res) {
 
         var filter = {
@@ -90,7 +90,7 @@ db.once("open", function() {
             }
         });
 
-        res.sendStatus(200).send("OK");
+        res.status(200).send("OK");
     });
 
     var port = process.env.PORT || 3000;
@@ -98,4 +98,8 @@ db.once("open", function() {
     app.listen(port, function() {
         console.log("port", port);
     });
+
+    setInterval(function () {
+        fetchIssues();
+    }, 10000); // 10 sec
 });
